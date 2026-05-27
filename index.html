@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #0f0f0f;
+      color: white;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-y: scroll;
+    }
+
+    .gallery {
+      column-count: 4;
+      column-gap: 12px;
+      padding: 12px;
+    }
+
+    .item {
+      break-inside: avoid;
+      margin-bottom: 12px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #181818;
+      position: relative;
+    }
+
+    img,
+    video {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+      transition: transform 0.25s ease;
+      background: #181818;
+    }
+
+    .item:hover img,
+    .item:hover video {
+      transform: scale(1.015);
+    }
+
+    @media (max-width: 1200px) {
+      .gallery {
+        column-count: 3;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .gallery {
+        column-count: 2;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .gallery {
+        column-count: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="gallery" id="gallery"></div>
+
+  <script>
+    // Add your files here
+    // Everything should exist inside the /media folder
+
+    // Automatically loaded from media.json
+// Generate media.json with any script or static generator
+
+let mediaFiles = [];
+
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+    const videoExtensions = ['mp4', 'webm', 'mov', 'm4v'];
+
+    const gallery = document.getElementById('gallery');
+
+async function loadGallery() {
+  const response = await fetch('./media.json');
+  mediaFiles = await response.json();
+
+  // Shuffle order (Fisher-Yates)
+  for (let i = mediaFiles.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [mediaFiles[i], mediaFiles[j]] = [mediaFiles[j], mediaFiles[i]];
+  }
+
+  mediaFiles.forEach(file => {
+    const extension = file.split('.').pop().toLowerCase();
+    const path = `media/${file}`;
+
+    const item = document.createElement('div');
+    item.className = 'item';
+
+    if (imageExtensions.includes(extension)) {
+      const img = document.createElement('img');
+      img.src = path;
+      img.loading = 'lazy';
+      item.appendChild(img);
+    }
+
+    if (videoExtensions.includes(extension)) {
+      const video = document.createElement('video');
+
+      video.src = path;
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+
+      item.appendChild(video);
+    }
+
+    gallery.appendChild(item);
+  });
+}
+
+loadGallery();
+  </script>
+
+</body>
+</html>
